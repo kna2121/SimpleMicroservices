@@ -15,6 +15,9 @@ from models.person import PersonCreate, PersonRead, PersonUpdate
 from models.address import AddressCreate, AddressRead, AddressUpdate
 from models.health import Health
 
+from models.course import CourseCreate, CourseRead, CourseUpdate
+from models.department import DepartmentCreate, DepartmentRead, DepartmentUpdate
+
 port = int(os.environ.get("FASTAPIPORT", 8000))
 
 # -----------------------------------------------------------------------------
@@ -22,6 +25,8 @@ port = int(os.environ.get("FASTAPIPORT", 8000))
 # -----------------------------------------------------------------------------
 persons: Dict[UUID, PersonRead] = {}
 addresses: Dict[UUID, AddressRead] = {}
+courses: Dict[UUID, CourseRead] = {}
+departments: Dict[str, DepartmentRead] = {}
 
 app = FastAPI(
     title="Person/Address API",
@@ -158,6 +163,38 @@ def update_person(person_id: UUID, update: PersonUpdate):
     stored.update(update.model_dump(exclude_unset=True))
     persons[person_id] = PersonRead(**stored)
     return persons[person_id]
+
+# -----------------------------------------------------------------------------
+# Course endpoints
+# -----------------------------------------------------------------------------
+@app.post("/courses", response_model=CourseRead, status_code=201)
+def create_course(course: CourseCreate):
+    # Each person gets its own UUID; stored as PersonRead
+    course_read = CourseRead(**course.model_dump())
+    courses[course_read.id] = course_read
+    return course_read
+
+@app.get("/courses", response_model=List[CourseRead])
+def list_courses(
+    course_code: Optional[str] = Query(None, description="Filter by course code"),
+    title: Optional[str] = Query(None, description="Filter by course title"),
+    professor: Optional[str] = Query(None, description="Filter by professor"),
+    semester: Optional[str] = Query(None, description="Filter by semester"),
+):
+    results = list(courses.values())
+
+    if course_code is not None:
+        results = [c for c in results if c.course_code == course_code]
+    if title is not None:
+        results = [c for c in results if c.title == title]
+    if professor is not None:
+        results = [c for c in results if c.professor == professor]
+    if semester is not None:
+        results = [c for c in results if c.semester == semester]
+
+    return results
+
+
 
 # -----------------------------------------------------------------------------
 # Root
