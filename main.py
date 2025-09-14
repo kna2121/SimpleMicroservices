@@ -169,7 +169,6 @@ def update_person(person_id: UUID, update: PersonUpdate):
 # -----------------------------------------------------------------------------
 @app.post("/courses", response_model=CourseRead, status_code=201)
 def create_course(course: CourseCreate):
-    # Each person gets its own UUID; stored as PersonRead
     course_read = CourseRead(**course.model_dump())
     courses[course_read.id] = course_read
     return course_read
@@ -195,13 +194,40 @@ def list_courses(
     return results
 
 
+# -----------------------------------------------------------------------------
+# Department endpoints
+# -----------------------------------------------------------------------------
+
+@app.post("/departments", response_model=DepartmentRead, status_code=201)
+def create_department(dept: DepartmentCreate):
+    dept_read = DepartmentRead(**dept.model_dump())
+    departments[dept_read.id] = dept_read
+    return dept_read
+
+@app.get("/departments", response_model=List[DepartmentRead])
+def list_departments(
+    code: Optional[str] = Query(None, description="Filter by department code"),
+    name: Optional[str] = Query(None, description="Filter by department name"),
+    chair: Optional[str] = Query(None, description="Filter by department chair"),
+):
+    results = list(departments.values())
+
+    if code is not None:
+        results = [d for d in results if d.code == code]
+    if name is not None:
+        results = [d for d in results if d.name == name]
+    if chair is not None:
+        results = [d for d in results if d.chair == chair]
+
+    return results
+
 
 # -----------------------------------------------------------------------------
 # Root
 # -----------------------------------------------------------------------------
 @app.get("/")
 def root():
-    return {"message": "Welcome to the Person/Address API. See /docs for OpenAPI UI."}
+    return {"message": "Welcome to the Person/Address/Course/Department API. See /docs for OpenAPI UI."}
 
 # -----------------------------------------------------------------------------
 # Entrypoint for `python main.py`
