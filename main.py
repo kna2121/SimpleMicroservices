@@ -192,7 +192,20 @@ def list_courses(
         results = [c for c in results if c.semester == semester]
 
     return results
+@app.get("/courses/{course_id}", response_model=CourseRead)
+def get_course(course_id: UUID):
+    if course_id not in courses:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return courses[course_id]
 
+@app.patch("/courses/{course_id}", response_model=CourseRead)
+def update_course(course_id: UUID, update:CourseUpdate):
+    if course_id not in courses:
+        raise HTTPException(status_code=404, detail="Course not found")
+    stored = courses[course_id].model_dump()
+    stored.update(update.model_dump(exclude_unset=True))
+    courses[course_id] = CourseRead(**stored)
+    return persons[course_id]
 
 # -----------------------------------------------------------------------------
 # Department endpoints
@@ -220,6 +233,21 @@ def list_departments(
         results = [d for d in results if d.chair == chair]
 
     return results
+
+@app.get("/departments/{dept_id}", response_model=DepartmentRead)
+def get_dept(dept_id: UUID):
+    if dept_id not in departments:
+        raise HTTPException(status_code=404, detail="Department not found")
+    return departments[dept_id]
+
+@app.patch("/departments/{dept_id}", response_model=DepartmentRead)
+def update_dept(dept_id: UUID, update:DepartmentUpdate):
+    if dept_id not in departments:
+        raise HTTPException(status_code=404, detail="Department not found")
+    stored = departments[dept_id].model_dump()
+    stored.update(update.model_dump(exclude_unset=True))
+    departments[dept_id] = DepartmentRead(**stored)
+    return departments[dept_id]
 
 
 # -----------------------------------------------------------------------------
