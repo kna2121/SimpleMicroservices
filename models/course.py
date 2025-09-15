@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional, List, Annotated
+from typing import Optional
 from uuid import UUID, uuid4
 from datetime import date, datetime
-from pydantic import BaseModel, Field, EmailStr, StringConstraints
+from pydantic import BaseModel, Field
 
 class CourseBase(BaseModel):
     id: UUID = Field(
@@ -21,7 +21,7 @@ class CourseBase(BaseModel):
         description="Unique course code.",
         json_schema_extra={"example": "COMS1004"},
     )
-    professor: date = Field(
+    professor: str = Field(
         ...,
         description="Course professor.",
         json_schema_extra={"example": "Professor Ferguson"},

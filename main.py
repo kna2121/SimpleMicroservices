@@ -29,7 +29,7 @@ courses: Dict[UUID, CourseRead] = {}
 departments: Dict[str, DepartmentRead] = {}
 
 app = FastAPI(
-    title="Person/Address API",
+    title="Person/Address/Course/Department API",
     description="Demo FastAPI app using Pydantic v2 models for Person and Address",
     version="0.1.0",
 )
@@ -205,7 +205,7 @@ def update_course(course_id: UUID, update:CourseUpdate):
     stored = courses[course_id].model_dump()
     stored.update(update.model_dump(exclude_unset=True))
     courses[course_id] = CourseRead(**stored)
-    return persons[course_id]
+    return courses[course_id]
 
 # -----------------------------------------------------------------------------
 # Department endpoints

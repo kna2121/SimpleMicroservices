@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Optional, Annotated, List
 from uuid import UUID, uuid4
-from datetime import date, datetime
-from pydantic import BaseModel, Field, EmailStr, StringConstraints
+from datetime import datetime
+from pydantic import BaseModel, Field, StringConstraints
 
 from .course import CourseBase
 
